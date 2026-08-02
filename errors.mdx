@@ -1,0 +1,60 @@
+---
+title: "Handling Errors"
+description: "What each TaskFlow error response means and how to resolve it."
+---
+
+TaskFlow uses standard HTTP status codes. When a request fails, the response body always follows the same shape:
+
+```json
+{
+  "error": "Not Found",
+  "message": "No project found with project_id 'abc123'."
+}
+```
+
+- **`error`** — a short, machine-friendly error type
+- **`message`** — a human-readable explanation, often including the specific value that caused the problem
+
+## Status codes you'll encounter
+
+| Code | Meaning | Common cause |
+|---|---|---|
+| `400` | Bad Request | A required field is missing, empty, or has an invalid value (e.g. an invalid `status`). |
+| `401` | Unauthorized | The `Authorization` header is missing, malformed, or has an invalid API key. |
+| `404` | Not Found | The `project_id` or `task_id` in your request doesn't exist. |
+
+## 400 — Bad Request
+
+Returned when the request body doesn't meet the API's requirements. This includes:
+
+- Missing a required field (`name` for projects; `project_id` and `title` for tasks)
+- Sending an empty string for a required field
+- Sending an invalid `status` value on `PATCH /tasks/{task_id}`
+- Sending an empty body to `PATCH /tasks/{task_id}` (at least one field is required)
+
+**Fix:** Check the request body against the [API Reference](/api-reference/introduction) for the endpoint you're calling, and confirm every required field is present and valid.
+
+## 401 — Unauthorized
+
+Returned when the API can't validate your credentials:
+
+```json
+{
+  "error": "Unauthorized",
+  "message": "Missing or invalid API key. Provide a valid key in the Authorization header as: Bearer <api_key>"
+}
+```
+
+**Fix:** Confirm your `Authorization` header is formatted exactly as `Authorization: Bearer <api_key>`, with no extra whitespace or quotes around the key.
+
+## 404 — Not Found
+
+Returned when a `project_id` or `task_id` referenced in the request doesn't exist. This is the most common error you'll see while integrating, because most TaskFlow operations depend on IDs from a previous step. See [Core Workflow](/guides/core-workflow) for the order operations need to happen in.
+
+**Fix:**
+- If a `project_id` is not found, create the project first with `POST /projects`.
+- If a `task_id` is not found, confirm you copied it correctly from the `POST /tasks` response, and that the task hasn't already been deleted.
+
+## Retrying requests
+
+If you get no response at all (rather than a 4xx error), the sandbox server may be waking up from being idle — this can take up to 60 seconds on the first request. Wait and retry once before assuming something is wrong.

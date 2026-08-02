@@ -1,0 +1,60 @@
+---
+title: "Working with Task Status"
+description: "How task status works, what values are valid, and how to update it."
+---
+
+Every task has a `status` field that tracks its progress. This guide covers how status works and how to change it.
+
+## Valid values
+
+`status` only accepts three exact values:
+
+- `pending`
+- `in_progress`
+- `done`
+
+These are case-sensitive and must match exactly. There's no built-in support for custom statuses.
+
+## Default status
+
+You can't set a task's status when creating it — `POST /tasks` doesn't accept a `status` field. Every new task starts as `pending`, and you update it afterward with `PATCH /tasks/{task_id}`.
+
+## Updating status
+
+Send a `PATCH` request with just the field you want to change:
+
+```bash
+curl -X PATCH https://test-writechoice.onrender.com/tasks/f9e8d7c6-b5a4-3210-fedc-ba9876543210 \
+  -H "Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "done"}'
+```
+
+You don't need to send every field — `title`, `description`, and `status` can each be updated independently or together in the same request. At least one field is required.
+
+## Common mistakes
+
+<AccordionGroup>
+  <Accordion title="Sending an invalid status value">
+    Values like `completed`, `Done`, or `finished` will return a `400 Bad Request`:
+
+    ```json
+    {
+      "error": "Bad Request",
+      "message": "Invalid status 'completed'. Allowed values are: pending, in_progress, done."
+    }
+    ```
+
+    Double-check spelling and casing against the three valid values above.
+  </Accordion>
+  <Accordion title="Trying to set status on task creation">
+    `POST /tasks` doesn't accept a `status` field — new tasks always start as `pending`. If you need a task to reflect a different status immediately, create it and then send a follow-up `PATCH` request.
+  </Accordion>
+  <Accordion title="Sending an empty request body">
+    `PATCH /tasks/{task_id}` requires at least one of `status`, `title`, or `description`. An empty body returns a `400 Bad Request`.
+  </Accordion>
+</AccordionGroup>
+
+## Full reference
+
+See [Update a Task](/api-reference/tasks/update-task) for the complete request and response schema.
