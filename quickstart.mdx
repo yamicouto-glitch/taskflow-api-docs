@@ -1,0 +1,198 @@
+---
+title: "Quickstart"
+description: "Authenticate and make your first project and task in a few requests."
+---
+
+This guide walks you through creating a project, adding a task to it, and updating that task's status — the core loop of the TaskFlow API.
+
+## 1. Get your API key
+
+For testing, use the sandbox key below against the sandbox server:
+
+```
+Base URL: https://test-writechoice.onrender.com/
+API Key:  tf-live-4a8f2c1e9b3d7e6a
+```
+
+<Warning>
+  This is a shared sandbox key for testing and documentation purposes only. Don't use it to store real data, and don't rely on it for a production integration.
+</Warning>
+
+## 2. Authenticate your requests
+
+Every request to TaskFlow must include your API key as a Bearer token in the `Authorization` header:
+
+```
+Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a
+```
+
+Requests without a valid key return a `401 Unauthorized` error.
+
+<Note>
+  If the API has been idle, the first request can take up to 60 seconds to respond while the server wakes up. This only happens once — after that, responses are fast.
+</Note>
+
+## 3. Create a project
+
+Every task lives inside a project, so that's always your first request.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://test-writechoice.onrender.com/projects \
+  -H "Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "API Documentation Revamp",
+    "description": "Rewriting all public-facing API docs for v2."
+  }'
+```
+
+```javascript Node.js
+const response = await fetch("https://test-writechoice.onrender.com/projects", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer tf-live-4a8f2c1e9b3d7e6a",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: "API Documentation Revamp",
+    description: "Rewriting all public-facing API docs for v2."
+  })
+});
+
+const project = await response.json();
+console.log(project);
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://test-writechoice.onrender.com/projects",
+    headers={"Authorization": "Bearer tf-live-4a8f2c1e9b3d7e6a"},
+    json={
+        "name": "API Documentation Revamp",
+        "description": "Rewriting all public-facing API docs for v2."
+    }
+)
+
+project = response.json()
+print(project)
+```
+
+</CodeGroup>
+
+The response includes a `project_id` — save it, you'll need it for the next step:
+
+```json
+{
+  "project_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "API Documentation Revamp",
+  "description": "Rewriting all public-facing API docs for v2.",
+  "created_at": "2025-05-12T10:30:00.000Z"
+}
+```
+
+## 4. Create a task in that project
+
+Use the `project_id` from the previous step. New tasks always start with a status of `pending`.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://test-writechoice.onrender.com/tasks \
+  -H "Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "title": "Write introduction page",
+    "description": "Draft the overview and getting started sections."
+  }'
+```
+
+```javascript Node.js
+const response = await fetch("https://test-writechoice.onrender.com/tasks", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer tf-live-4a8f2c1e9b3d7e6a",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    project_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    title: "Write introduction page",
+    description: "Draft the overview and getting started sections."
+  })
+});
+
+const task = await response.json();
+console.log(task);
+```
+
+</CodeGroup>
+
+The response includes a `task_id` — this is what you'll use to update or delete the task later:
+
+```json
+{
+  "task_id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+  "project_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "title": "Write introduction page",
+  "description": "Draft the overview and getting started sections.",
+  "status": "pending",
+  "created_at": "2025-05-12T10:35:00.000Z",
+  "updated_at": "2025-05-12T10:35:00.000Z"
+}
+```
+
+## 5. Update the task's status
+
+As work progresses, update the task's status to `in_progress` or `done`:
+
+<CodeGroup>
+
+```bash cURL
+curl -X PATCH https://test-writechoice.onrender.com/tasks/f9e8d7c6-b5a4-3210-fedc-ba9876543210 \
+  -H "Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "in_progress"}'
+```
+
+```javascript Node.js
+const response = await fetch(
+  "https://test-writechoice.onrender.com/tasks/f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+  {
+    method: "PATCH",
+    headers: {
+      "Authorization": "Bearer tf-live-4a8f2c1e9b3d7e6a",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ status: "in_progress" })
+  }
+);
+
+const updatedTask = await response.json();
+console.log(updatedTask);
+```
+
+</CodeGroup>
+
+## 6. List tasks in the project
+
+Confirm your changes by listing every task in the project:
+
+```bash cURL
+curl https://test-writechoice.onrender.com/projects/a1b2c3d4-e5f6-7890-abcd-ef1234567890/tasks \
+  -H "Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a"
+```
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Core Workflow" icon="diagram-project" href="/guides/core-workflow">
+    See the full project → task lifecycle, including deletion.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Explore every endpoint, parameter, and response schema.
+  </Card>
+</CardGroup>

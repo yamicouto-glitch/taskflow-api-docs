@@ -1,0 +1,63 @@
+---
+title: "Introduction"
+description: "TaskFlow is a simple task management API for creating projects, tracking tasks, and managing their status."
+---
+
+## What is TaskFlow?
+
+TaskFlow is a lightweight REST API for managing projects and the tasks inside them. It's built around two resources:
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder">
+    A container for related work. Every task belongs to exactly one project.
+  </Card>
+  <Card title="Tasks" icon="list-check">
+    A unit of work inside a project, with a title, an optional description, and a status.
+  </Card>
+</CardGroup>
+
+With TaskFlow, you can:
+
+- Create a project to group related work
+- Add tasks to that project
+- List all tasks in a project
+- Update a task's title, description, or status
+- Delete tasks you no longer need
+
+## How the resources relate
+
+Projects and tasks are dependent on each other, and that dependency shapes how you'll use the API:
+
+1. **A project must exist before you can create tasks in it.** Every task requires a `project_id`, which you only get back after creating a project.
+2. **A task must exist before you can update or delete it.** Task operations require a `task_id`, returned when the task is created.
+
+If you try to skip a step — for example, creating a task with a `project_id` that doesn't exist — the API returns a `404 Not Found` error telling you to create the project first.
+
+This dependency is the most important thing to understand before making your first request, and it's covered step by step in the [Core Workflow](/guides/core-workflow) guide.
+
+## Base URL
+
+```
+https://test-writechoice.onrender.com/
+```
+
+<Note>
+  This is a test/sandbox environment. If the server has been idle, the first request of the day may take up to 60 seconds to respond while it wakes up. This is expected — subsequent requests will be fast.
+</Note>
+
+## Where to start
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Authenticate and make your first request in under 5 minutes.
+  </Card>
+  <Card title="Core Workflow" icon="diagram-project" href="/guides/core-workflow">
+    Understand the project → task lifecycle before you build.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Full details on every endpoint, parameter, and response.
+  </Card>
+  <Card title="Handling Errors" icon="triangle-exclamation" href="/guides/errors">
+    What each error response means and how to resolve it.
+  </Card>
+</CardGroup>
