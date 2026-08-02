@@ -1,0 +1,74 @@
+---
+title: "API Reference Overview"
+description: "Base URL, authentication, and a summary of every TaskFlow endpoint."
+---
+
+## Base URL
+
+```
+https://test-writechoice.onrender.com/
+```
+
+## Authentication
+
+Every request requires a Bearer token in the `Authorization` header:
+
+```
+Authorization: Bearer tf-live-4a8f2c1e9b3d7e6a
+```
+
+Requests without a valid key return `401 Unauthorized`. There's no separate login or token-refresh step — the key itself is the credential.
+
+## Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/projects` | Create a project |
+| `POST` | `/tasks` | Create a task in a project |
+| `GET` | `/projects/{project_id}/tasks` | List all tasks in a project |
+| `PATCH` | `/tasks/{task_id}` | Update a task's title, description, or status |
+| `DELETE` | `/tasks/{task_id}` | Permanently delete a task |
+
+<Note>
+  Not sure what order to call these in? Start with [Core Workflow](/guides/core-workflow) — projects and tasks depend on each other, and calling them out of order is the most common source of errors.
+</Note>
+
+## Response format
+
+Successful responses return the resource (or list of resources) as JSON, matching the shapes below.
+
+<AccordionGroup>
+  <Accordion title="Project object">
+    ```json
+    {
+      "project_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "API Documentation Revamp",
+      "description": "Rewriting all public-facing API docs for v2.",
+      "created_at": "2025-05-12T10:30:00.000Z"
+    }
+    ```
+  </Accordion>
+  <Accordion title="Task object">
+    ```json
+    {
+      "task_id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+      "project_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "title": "Write introduction page",
+      "description": "Draft the overview and getting started sections.",
+      "status": "pending",
+      "created_at": "2025-05-12T10:35:00.000Z",
+      "updated_at": "2025-05-12T11:00:00.000Z"
+    }
+    ```
+  </Accordion>
+  <Accordion title="Error object">
+    ```json
+    {
+      "error": "Not Found",
+      "message": "No project found with project_id 'abc123'."
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+Errors follow the same shape across every endpoint — see [Handling Errors](/guides/errors) for the full breakdown by status code.
